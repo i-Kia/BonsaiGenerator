@@ -4,23 +4,22 @@ import random
 import math
 import time
 import sys
-from turtle import done
-#print
+
 try:
     from colored import fg, attr
 except:
-    print("The library 'colored' was not found, try installing it with 'pip install colored' ")
+    I = input('Warning: Module named \'colored\' is not installed \n Would you like to install it? [y/N] : ')
+    if I.lower() == 'y':
+        os.system('pip install colored')
     exit()
-    
+
 def clearScreen():
-    if sys.platform.startswith('linux'):
-        os.system('clear')
-    else:
-        os.system('cls')
+    print('print "\033c"')
 
 # Colour Printing
 class colours:
     leafSymbols = ['#','$','%','&','@','*',',']
+    woodSymbols = ['/','\\','|','_','-']
 
     leafColors = {  
         'light_leaves' : [40,46,47,82,83,84,148],
@@ -42,19 +41,6 @@ class colours:
         'moss_wood' : [101,137]
     }
 
-def returnPrintColour(string, colours, bold=True, singleChar=False):
-    coin = [True, False]
-    
-    if singleChar:
-        output = string
-    else:
-        output = random.choice(string)
-
-    if random.choice(coin) and bold:
-        return (fg(random.choice(colours)) + attr('bold') + output + attr('reset'))
-    else:
-        return (fg(random.choice(colours)) + output + attr('reset'))
-
 def printColour(string, colours, bold=True, singleChar=False):
     coin = [True, False]
     
@@ -64,9 +50,9 @@ def printColour(string, colours, bold=True, singleChar=False):
         output = random.choice(string)
 
     if random.choice(coin) and bold:
-        print ((fg(random.choice(colours)) + attr('bold') + output + attr('reset')), end="\r")
+        print ((fg(random.choice(colours)) + attr('bold') + output + attr('reset')), end="")
     else:
-        print ((fg(random.choice(colours)) + output + attr('reset')), end="\r")
+        print ((fg(random.choice(colours)) + output + attr('reset')), end="")
 
 class pots:
     defaultPot = {
@@ -124,12 +110,14 @@ class pots:
 
 class bonsai:
     def __init__(self, leafType, woodType, age=0, sHeight=os.get_terminal_size()[1], sLength=os.get_terminal_size()[0], seed=0):
-        if seed != 0:
-            random.seed(seed)
-            self.seed = seed
-        else:
-            self.seed = random.randrange(sys.maxsize)
-            random.seed(self.seed)
+        #if seed != 0:
+        #    random.seed(seed)
+        #    self.seed = seed
+        #else:
+        #    self.seed = random.randrange(sys.maxsize)
+        #    random.seed(self.seed)
+        #self.seed = seed
+        #random.seed(self.seed)
 
         self.leafType = leafType
         self.woodType = woodType
@@ -193,7 +181,7 @@ class bonsai:
                     self.screen[startLine + line][space] = ' '
 
                 for char in range(len(pot['pot'][line])):
-                    self.screen[startLine + line][char + (spaceSize)] = pot['pot'][line][char]
+                    self.screen[startLine + line][char + (spaceSize)] = '\033[1m' + pot['pot'][line][char] + '\033[0m'
                     
                 for space in range(spaceSize):
                     self.screen[startLine + line][space + len(pot['pot'][0]) + (spaceSize)] = ' '
@@ -226,12 +214,12 @@ class bonsai:
                         if char >= pot['labelStart']-1 and char < pot['labelEnd']:
                             self.screen[startLine + line][char + (spaceSize)] = labelString[math.trunc( char - ( (len(pot['pot'][line]) - len(labelString)) / 2 ) )] 
                         else:
-                            self.screen[startLine + line][char + (spaceSize)] = pot['pot'][line][char]
+                            self.screen[startLine + line][char + (spaceSize)] = '\033[1m' + pot['pot'][line][char] + '\033[0m'
                     
                 # Don't add Label
                 else:
                     for char in range(len(pot['pot'][line])):
-                        self.screen[startLine + line][char + (spaceSize)] = pot['pot'][line][char]
+                        self.screen[startLine + line][char + (spaceSize)] = '\033[1m' + pot['pot'][line][char] + '\033[0m'
                     
                 for space in range(spaceSize):
                     self.screen[startLine + line][space + len(pot['pot'][0]) + (spaceSize)] = ' '
@@ -249,20 +237,19 @@ class bonsai:
 
         self.root[0] -= 1
 
-    def printSelf(self):
-        screen2print = ''
+    def printSelf(self, cls=True):
+        if cls:
+            clearScreen()
 
         for line in self.screen:
             for char in line:
                 if char == 'l~':
-                    screen2print += returnPrintColour(self.leaf_ch, self.leaf_c)
+                    printColour(self.leaf_ch, self.leaf_c)
                 elif char[0] == 'w':
-                    screen2print += returnPrintColour(char[1], self.wood_c, False, True)
+                    printColour(char[1], self.wood_c, False, True)
                 else:
-                    screen2print += char
-            screen2print += '\n'
-
-        print(screen2print, end='')
+                    print(char, end="")
+            print('')
 
     def calculateDistribution(self, direction):
         if direction == 'SW':
@@ -384,13 +371,12 @@ class bonsai:
 
                     leaves.append(addLeafPos)
 
-                    if sleep != 0:
-                        self.printSelf()
-                        time.sleep(sleep)
+                if sleep != 0:
+                    self.printSelf()
+                    time.sleep(sleep)
 
                 leaves.remove(currentLeafPos) 
 
-        clearScreen()
         self.printSelf()
 
 #b = bonsai('autumn_leaves','dark_wood')
@@ -411,44 +397,16 @@ if __name__ == "__main__":
     leafType = ''
     woodType = ''
     message = ''
-    seed = 0
-    branches = 0
-    noClip = False
 
     # Help
     if '-h' in sys.argv:
-        print('python3 bonsai.py -[h, l, t, c, w, m, v, vv, d, s, f] {...}\n\n-h  :: Help command\n-l  :: Show live growth\n-t  :: Delay between growth\n-c  :: Type of leaves (-hc for list)\n-w  :: Type of wood (-hw for list)\n-m  :: Write a message on the pot\n-v  :: Verbose customation\n-vv :: More verbose customation\n-d  :: Add date to pot\n-s  :: Use custom seed\n-f  :: Load from file\n')
+        print('python3 bonsai.py -[h, l, t, c, w, m, v, vv, d, s] {...}\n\n-h  :: Help command\n-l  :: Show live growth\n-t  :: Delay between growth\n-c  :: Type of leaves (-hc for list)\n-w  :: Type of wood (-hw for list)\n-m  :: Write a message on the pot\n-v  :: Verbose customation\n-vv :: More verbose customation\n-d  :: Add date to pot\n-s  :: Use custom seed')
         exit()
     elif '-hc' in sys.argv:
         print('List of leaf types: \n\nlight_leaves\nyellow_leaves\nmint_leaves\ngreen_leaves\ndark_leaves\nbrown_leaves\nautumn_leaves')
         exit()
     elif '-hw' in sys.argv:
         print('List of wood types: \n\nyellow_wood\nlight_wood\ndark_wood\npink_wood\nlred_wood\nred_wood\nmoss_wood')
-        exit()
-
-    if '-f' in sys.argv:
-        if '-c' in sys.argv:
-            index = sys.argv.index('-c')
-            leafType = sys.argv[index+1]
-        if '-w' in sys.argv:
-            index = sys.argv.index('-w')
-            woodType = sys.argv[index+1]
-
-        b = bonsai(leafType,woodType,seed=1)
-
-        index = sys.argv.index('-f')
-        name = sys.argv[index+1]
-
-        currentLine = 0
-        currentChar = 0
-        for f in open(name, 'r'):
-            if f != '\n':
-                b.screen[currentLine][currentChar] = f[:-1]
-                currentChar += 1
-            else:
-                currentLine += 1
-                currentChar = 0
-        b.printSelf()
         exit()
 
     # Verbose Outputs
@@ -488,6 +446,13 @@ if __name__ == "__main__":
         message = input('Enter pop label: ')
 
     # Set Params
+    if '-s' in sys.argv:
+        index = sys.argv.index('-s')
+        seed = int(sys.argv[index+1])
+    else:
+        seed = random.randrange(sys.maxsize
+    random.seed(seed)
+
     if '-l' in sys.argv:
         sleepTime = 0.05
     if '-t' in sys.argv:
@@ -496,9 +461,6 @@ if __name__ == "__main__":
     if '-c' in sys.argv:
         index = sys.argv.index('-c')
         leafType = sys.argv[index+1]
-    if '-s' in sys.argv:
-        index = sys.argv.index('-s')
-        seed = sys.argv[index+1]
     if '-w' in sys.argv:
         index = sys.argv.index('-w')
         woodType = sys.argv[index+1]
@@ -509,30 +471,41 @@ if __name__ == "__main__":
         index = sys.argv.index('-w')
         message = sys.argv[index+1]
 
-    b = bonsai(leafType,woodType,seed=seed)
-    b.addPot(label=message, type='')
-
-    if branches < 1:
-        branches = random.randint(2,6)
-
-    for i in range(branches):
-        b.growBranch(sleep=sleepTime, noClip=noClip)
-
-    #clearScreen()
-    b.printSelf()
-    doNext = input('')
-    if doNext == 'seed':
+    if verboseOut != True:
+        # Plant Pot
+        b = bonsai(leafType,woodType,seed=seed)
+        b.addPot(label=message, type='')
         b.printSelf()
-        print(b.seed)
-    elif doNext == 'save':
-        name = input('Enter Name: ')
-        with open(name, 'w') as f:
-            for line in b.screen:
-                for char in line:
-                    f.write(char + '\n')
-                f.write('\n')
-    else:
-        exit()
 
+        for i in range(random.randint(2,6)):
+            b.growBranch(sleep=sleepTime)
+    
+        b.printSelf()
+        doNext = input('')
+        if doNext == 'seed':
+            clearScreen()
+            b.printSelf()
+            print(seed)
+        else:
+            exit()
+
+    else:
+        b = bonsai(leafType,woodType,seed=seed)
+        b.addPot(label=message, type='')
+
+        if branches < 1:
+            branches = random.randint(2,6)
+
+        for i in range(branches):
+            b.growBranch(sleep=sleepTime, noClip=noClip)
+
+        b.printSelf()
+        doNext = input('')
+        if doNext == 'seed':
+            clearScreen()
+            b.printSelf()
+            print(seed)
+        else:
+            exit()
 
 # self.screen[startLine + line][char + (spaceSize)] = labelString[math.trunc( char - ( (len(pot['pot'][line]) - len(labelString)) / 2 ) )] 
