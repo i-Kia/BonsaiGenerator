@@ -7,3 +7,6 @@
 or
 
 `python3 bonsaiGenerator.py -[h, l, t, c, w, m, v, vv, d, s, f] {...}`
+
+Example:
+`python3 bonsai.py -w dark_wood -c green_leaves -s 8858513094106335604`
