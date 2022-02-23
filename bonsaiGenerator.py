@@ -1,3 +1,5 @@
+# Version 2.2 - LINUX
+
 import datetime
 import os
 import random
@@ -110,14 +112,6 @@ class pots:
 
 class bonsai:
     def __init__(self, leafType, woodType, age=0, sHeight=os.get_terminal_size()[1], sLength=os.get_terminal_size()[0], seed=0):
-        #if seed != 0:
-        #    random.seed(seed)
-        #    self.seed = seed
-        #else:
-        #    self.seed = random.randrange(sys.maxsize)
-        #    random.seed(self.seed)
-        #self.seed = seed
-        #random.seed(self.seed)
 
         self.leafType = leafType
         self.woodType = woodType
@@ -275,8 +269,7 @@ class bonsai:
         currentPos[0] += self.root[0]
         currentPos[1] += self.root[1]
 
-        #######################################################################################
-                                            # Grow Branch #
+        # Grow Branch 
 
         # Default Direction Automation
         if autoMate:
@@ -347,9 +340,7 @@ class bonsai:
                 self.printSelf()
                 time.sleep(sleep)
 
-        #######################################################################################
-                                            # Grow Leaves #
-        # Main Growth
+        # Grow Leaves
         leaves = []
         if currentPos[0] > self.sHeight - 7 and noClip:
             pass
@@ -379,28 +370,17 @@ class bonsai:
 
         self.printSelf()
 
-#b = bonsai('autumn_leaves','dark_wood')
-#b.addPot(label='', type='')
-#b.printSelf()
-#input('>> ')
-#b.printSelf()
-#b.printRoot()
-#b.growArm(sleep=0.05, direction='NE')
-#b.growArm(sleep=0.05, direction='NW')
-#b.growBranch(sleep=0.05)
-#b.growBranch(sleep=0.05)
-#b.growBranch(sleep=0.05)
-#b.printSelf()
-
 if __name__ == "__main__":
     sleepTime = 0
     leafType = ''
     woodType = ''
     message = ''
+    branches = 0
+    noClip = True
 
     # Help
     if '-h' in sys.argv:
-        print('python3 bonsai.py -[h, l, t, c, w, m, v, vv, d, s] {...}\n\n-h  :: Help command\n-l  :: Show live growth\n-t  :: Delay between growth\n-c  :: Type of leaves (-hc for list)\n-w  :: Type of wood (-hw for list)\n-m  :: Write a message on the pot\n-v  :: Verbose customation\n-vv :: More verbose customation\n-d  :: Add date to pot\n-s  :: Use custom seed')
+        print('python3 bonsai.py -[h, l, c, w, m, v, vv, d, s] {...}\n\n-h  :: Help command\n-l  :: Show live growth (Optional: -l {time is seconds} )\n-c  :: Type of leaves (-hc for list)\n-w  :: Type of wood (-hw for list)\n-m  :: Write a message on the pot\n-v  :: Verbose customation\n-vv :: More verbose customation\n-d  :: Add date to pot\n-s  :: Use custom seed')
         exit()
     elif '-hc' in sys.argv:
         print('List of leaf types: \n\nlight_leaves\nyellow_leaves\nmint_leaves\ngreen_leaves\ndark_leaves\nbrown_leaves\nautumn_leaves')
@@ -432,7 +412,6 @@ if __name__ == "__main__":
         useDateTime = input('Use Date [y/N]: ')
         if useDateTime.lower()  == 'y':
             message = str(datetime.date.today())
-
     elif '-v' in sys.argv:
         sleepTime = float(input('Speed of growth: '))
         print('List of leaf types: \n\n 0 : light_leaves\n 1 : yellow_leaves\n 2 : mint_leaves\n 3 : green_leaves\n 4 : dark_leaves\n 5 : brown_leaves\n 6 : autumn_leaves\n')
@@ -450,62 +429,42 @@ if __name__ == "__main__":
         index = sys.argv.index('-s')
         seed = int(sys.argv[index+1])
     else:
-        seed = random.randrange(sys.maxsize
+        seed = random.randrange(sys.maxsize)
     random.seed(seed)
 
     if '-l' in sys.argv:
         sleepTime = 0.05
-    if '-t' in sys.argv:
-        index = sys.argv.index('-t')
-        sleepTime = float(sys.argv[index+1])
+        index = sys.argv.index('-l')
+        if len(sys.argv) > index+1:
+            if  sys.argv[index+1][0] != '-':
+                sleepTime = float(sys.argv[index+1])
     if '-c' in sys.argv:
         index = sys.argv.index('-c')
         leafType = sys.argv[index+1]
     if '-w' in sys.argv:
         index = sys.argv.index('-w')
         woodType = sys.argv[index+1]
-
     if '-d' in sys.argv:
         message = str(datetime.date.today())
     elif '-m' in sys.argv:
         index = sys.argv.index('-w')
         message = sys.argv[index+1]
 
-    if verboseOut != True:
-        # Plant Pot
-        b = bonsai(leafType,woodType,seed=seed)
-        b.addPot(label=message, type='')
-        b.printSelf()
+    # Grow Plant
+    b = bonsai(leafType,woodType,seed=seed)
+    b.addPot(label=message, type='')
 
-        for i in range(random.randint(2,6)):
-            b.growBranch(sleep=sleepTime)
-    
-        b.printSelf()
-        doNext = input('')
-        if doNext == 'seed':
-            clearScreen()
-            b.printSelf()
-            print(seed)
-        else:
-            exit()
+    if branches < 1:
+       branches = random.randint(2,6)
 
+    for i in range(branches):
+        b.growBranch(sleep=sleepTime, noClip=noClip)
+
+    b.printSelf()
+    doNext = input('')
+    if doNext == 'seed':
+        clearScreen()
+        b.printSelf()
+        print(seed)
     else:
-        b = bonsai(leafType,woodType,seed=seed)
-        b.addPot(label=message, type='')
-
-        if branches < 1:
-            branches = random.randint(2,6)
-
-        for i in range(branches):
-            b.growBranch(sleep=sleepTime, noClip=noClip)
-
-        b.printSelf()
-        doNext = input('')
-        if doNext == 'seed':
-            clearScreen()
-            b.printSelf()
-            print(seed)
-        else:
-            exit()
-
-# self.screen[startLine + line][char + (spaceSize)] = labelString[math.trunc( char - ( (len(pot['pot'][line]) - len(labelString)) / 2 ) )] 
+        exit()
