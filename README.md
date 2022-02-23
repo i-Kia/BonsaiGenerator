@@ -8,7 +8,7 @@ or
 
 `python3 bonsaiGenerator.py -[h, l, c, w, m, v, vv, d, s] {...}`
                                                                                          
-Example (Uncoloured): `python3 bonsai.py -w dark_wood -c green_leaves -s 8858513094106335604 -d`                                                                                         
+Example (Raw Text, Uncoloured): `python3 bonsai.py -w dark_wood -c green_leaves -s 8858513094106335604 -d`                                                                                         
 ```
                                                       %&        
                                                     # %$@       
